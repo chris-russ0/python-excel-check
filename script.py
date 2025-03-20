@@ -15,7 +15,7 @@ def confronta_codici(file1, colonna1, file2, colonna2, output_file):
     # Scrivi i risultati su un file di testo
     with open(output_file, 'w') as f:
         f.write(f"\n{'-'*40}\n")
-        f.write(f"Codici presenti in '{file1}' ma mancanti in '{file2}':\n")
+        f.write(f"Values present in '{file1}' but missing in '{file2}':\n")
         if mancanti_in_file2:
             for codice in mancanti_in_file2:
                 # Convert to integer if the number is a float with no fractional part
@@ -23,7 +23,7 @@ def confronta_codici(file1, colonna1, file2, colonna2, output_file):
                     codice = int(codice)
                 f.write(f"{codice}\n")
         else:
-            f.write("Nessun codice mancante.\n")
+            f.write("No missing values.\n")
         f.write(f"{'-'*40}\n")
 
     # Stampa il totale delle righe scritte
