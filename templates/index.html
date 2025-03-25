@@ -3,46 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confronta Codici</title>
-    <!-- Include Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Include Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Link to external CSS -->
-    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
+    <title>Code Comparison Tool</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Compare columns</h1>
-        <form method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="file1">File 1</label>
-                <input type="file" class="form-control-file" id="file1" name="file1" required>
-            </div>
-            <div class="form-group">
-                <label for="colonna1">Column name</label>
-                <input type="text" class="form-control" id="colonna1" name="colonna1" placeholder="Colonna File 1" required>
-            </div>
-            <div class="form-group">
-                <label for="file2">File 2</label>
-                <input type="file" class="form-control-file" id="file2" name="file2" required>
-            </div>
-            <div class="form-group">
-                <label for="colonna2">Column name</label>
-                <input type="text" class="form-control" id="colonna2" name="colonna2" placeholder="Colonna File 2" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Compare</button>
-        </form>
-        {% if total_lines is not none %}
-        <div class="result alert alert-info mt-4">
-            <p>Total lines printed: {{ total_lines }}</p>
-            <a href="/download" class="btn btn-success">Download Result</a>
+        <h1>Excel Code Comparison</h1>
+        
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
         </div>
+
+        <form method="POST" enctype="multipart/form-data" class="form-container">
+            <div class="file-input-wrapper">
+                <input type="file" name="file1" id="file1" accept=".xlsx,.xls" required class="file-input">
+                <label for="file1" class="file-input-label">
+                    Select First Excel File
+                </label>
+            </div>
+            
+            <input type="text" name="colonna1" placeholder="Column 1" required class="column-input">
+            
+            <div class="file-input-wrapper">
+                <input type="file" name="file2" id="file2" accept=".xlsx,.xls" required class="file-input">
+                <label for="file2" class="file-input-label">
+                    Select Second Excel File
+                </label>
+            </div>
+            
+            <input type="text" name="colonna2" placeholder="Column 2" required class="column-input">
+            
+            <button type="submit" class="submit-btn">Compare Files</button>
+        </form>
+
+        {% if total_lines is defined %}
+            <div class="results">
+                <p>Total missing codes: {{ total_lines }}</p>
+                <a href="{{ url_for('download') }}" class="download-btn">Download Results</a>
+            </div>
         {% endif %}
     </div>
-    <!-- Include Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
