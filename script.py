@@ -1,3 +1,4 @@
+import streamlit as st
 import pandas as pd
 import logging
 from typing import Optional, Set, Union
@@ -41,10 +42,6 @@ class CodeComparisonTool:
             # Convert to Path object for better handling
             file_path = Path(file_path)
             
-            # Validate file existence
-            if not file_path.exists():
-                raise FileNotFoundError(f"File not found: {file_path}")
-            
             # Read Excel file
             df = pd.read_excel(file_path)
             
@@ -59,7 +56,7 @@ class CodeComparisonTool:
                 return set(df[column_name].dropna().astype(str).str.lower())
         
         except Exception as e:
-            self.logger.error(f"Error processing {file_path}: {e}")
+            st.error(f"Error processing {file_path}: {e}")
             raise
 
     def compare_codes(
@@ -68,7 +65,6 @@ class CodeComparisonTool:
         column1: str, 
         file2: Union[str, Path], 
         column2: str, 
-        output_file: Union[str, Path] = 'code_comparison.txt',
         case_sensitive: bool = False,
         comparison_direction: str = 'left_to_right',
         return_missing: bool = False
@@ -80,16 +76,12 @@ class CodeComparisonTool:
         :param column1: Column name in first file
         :param file2: Second Excel file path
         :param column2: Column name in second file
-        :param output_file: Path for output file
         :param case_sensitive: Whether comparison is case-sensitive
         :param comparison_direction: Direction of comparison
         :param return_missing: Whether to return missing codes
         :return: Set of missing codes or None
         """
         try:
-            # Convert to Path objects
-            output_file = Path(output_file)
-            
             # Load codes from both files
             codes1 = self._load_excel_column(file1, column1, case_sensitive)
             codes2 = self._load_excel_column(file2, column2, case_sensitive)
@@ -104,56 +96,141 @@ class CodeComparisonTool:
             else:
                 raise ValueError("Invalid comparison direction")
             
-            # Write results to output file
-            with output_file.open('w', encoding='utf-8') as f:
-                f.write(f"\n{'-'*40}\n")
-                f.write(f"{direction_msg}:\n")
-                
-                if missing_codes:
-                    for code in sorted(missing_codes):
-                        f.write(f"{code}\n")
-                else:
-                    f.write("No missing values.\n")
-                
-                f.write(f"{'-'*40}\n")
-            
             # Log results
-            self.logger.info(f"Comparison complete. Missing values: {len(missing_codes)}")
-            self.logger.info(f"Results saved to: {output_file}")
+            st.info(f"Comparison complete. Missing values: {len(missing_codes)}")
             
             # Return missing codes if requested
             return missing_codes if return_missing else None
         
         except Exception as e:
-            self.logger.error(f"Comparison failed: {e}")
+            st.error(f"Comparison failed: {e}")
             raise
 
 def main():
     """
-    Example usage of the CodeComparisonTool
+    Streamlit app for Code Comparison Tool
     """
-    try:
-        # Initialize the comparison tool
-        comparison_tool = CodeComparisonTool(log_level=logging.DEBUG)
-        
-        # Perform code comparison
-        missing_codes = comparison_tool.compare_codes(
-            file1='prodotti_online.xlsx',
-            column1='Variant Barcode',
-            file2='prodotti_anagrafica.xlsx',
-            column2='UPC',
-            output_file='code_comparison.txt',
-            case_sensitive=False,
-            comparison_direction='left_to_right',
-            return_missing=True
+    # Page configuration
+    st.set_page_config(
+        page_title="Code Comparison Tool",
+        page_icon="🔍",
+        layout="wide"
+    )
+
+    # Title and description
+    st.title("📊 Excel Code Comparison Tool")
+    st.markdown("Compare codes between two Excel files and identify missing values.")
+
+    # Initialize the comparison tool
+    comparison_tool = CodeComparisonTool(log_level=logging.INFO)
+
+    # Sidebar for configuration
+    st.sidebar.header("📝 Comparison Settings")
+
+    # File uploaders
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader("First Excel File")
+        file1 = st.file_uploader(
+            "Upload First Excel File", 
+            type=['xlsx', 'xls'],
+            key="file1"
         )
-        
-        # Optional: Additional processing of missing codes
-        if missing_codes:
-            print(f"Missing codes: {missing_codes}")
+        column1 = st.text_input(
+            "Column Name for First File", 
+            key="column1"
+        )
+
+    with col2:
+        st.subheader("Second Excel File")
+        file2 = st.file_uploader(
+            "Upload Second Excel File", 
+            type=['xlsx', 'xls'],
+            key="file2"
+        )
+        column2 = st.text_input(
+            "Column Name for Second File", 
+            key="column2"
+        )
+
+    # Comparison options
+    col_sensitive, col_direction = st.columns(2)
     
-    except Exception as e:
-        logging.error(f"Execution failed: {e}")
+    with col_sensitive:
+        case_sensitive = st.checkbox("Case Sensitive Comparison", value=False)
+    
+    with col_direction:
+        comparison_direction = st.selectbox(
+            "Comparison Direction",
+            ["Left to Right", "Right to Left"],
+            index=0
+        )
+
+    # Comparison button
+    if st.button("Compare Files", type="primary"):
+        # Validate inputs
+        if not file1 or not file2:
+            st.warning("Please upload both Excel files.")
+            return
+
+        if not column1 or not column2:
+            st.warning("Please specify column names for both files.")
+            return
+
+        try:
+            # Perform comparison
+            missing_codes = comparison_tool.compare_codes(
+                file1=file1,
+                column1=column1,
+                file2=file2,
+                column2=column2,
+                case_sensitive=case_sensitive,
+                comparison_direction=comparison_direction.lower().replace(" ", "_"),
+                return_missing=True
+            )
+
+            # Display results
+            st.subheader("Comparison Results")
+            
+            if missing_codes:
+                # Metrics
+                st.metric(label="Missing Codes", value=len(missing_codes))
+                
+                # Show missing codes
+                st.markdown("### 🔍 Missing Codes")
+                
+                # Option to show full list or sample
+                show_full = st.checkbox("Show Full List of Missing Codes")
+                
+                if show_full:
+                    st.dataframe(pd.DataFrame(list(missing_codes), columns=['Missing Codes']))
+                else:
+                    st.dataframe(pd.DataFrame(list(missing_codes)[:50], columns=['Sample of Missing Codes']))
+                
+                # Download option
+                missing_codes_df = pd.DataFrame(list(missing_codes), columns=['Missing Codes'])
+                csv = missing_codes_df.to_csv(index=False)
+                st.download_button(
+                    label="Download Missing Codes",
+                    data=csv,
+                    file_name='missing_codes.csv',
+                    mime='text/csv',
+                )
+            else:
+                st.success("No missing codes found! 🎉")
+
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+
+    # Footer
+    st.markdown("---")
+    st.markdown("""
+    ### About This Tool
+    - Compare codes between two Excel files
+    - Identify missing values across datasets
+    - Flexible comparison options
+    """)
 
 if __name__ == "__main__":
     main()
