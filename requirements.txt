@@ -1,62 +1,66 @@
 # Core Python Libraries
-setuptools>=57.4.0
-wheel>=0.37.0
+setuptools>=65.5.1
+wheel>=0.38.4
 
-# Data Processing
-pandas>=1.5.3
-numpy>=1.24.2
+# Data Processing and Analysis
+pandas>=2.0.1
+numpy>=1.24.3
 openpyxl>=3.1.2
 xlrd>=2.0.1
-XlsxWriter>=3.0.9
+XlsxWriter>=3.1.0
+scipy>=1.10.1
 
-# Web Framework (if using Flask)
-flask>=2.2.3
-werkzeug>=2.2.3
-jinja2>=3.1.2
+# Streamlit and Web Rendering
+streamlit>=1.22.0
+streamlit-extras>=0.2.7
 
-# GUI Frameworks (choose one)
-# PyQt5 Option
-PyQt5>=5.15.9
-PyQtWebEngine>=5.15.6
-
-# Electron-like Option
-pywebview>=0.7.7
-
-# Build and Packaging
-pyinstaller>=5.10.1
-py2exe>=0.13.0.0  # Windows-specific
-py2app>=0.28.5    # macOS-specific
-
-# Optional: For advanced Excel handling
-xlwings>=0.29.1
+# Excel and Data Handling
 python-excel>=0.4.0
+xlwings>=0.29.1
+et-xmlfile>=1.1.0
+
+# Optional: Advanced Data Manipulation
+pyarrow>=12.0.0  # Faster data handling
+polars>=0.17.3   # Alternative to pandas
+
+# Visualization (optional but recommended)
+plotly>=5.14.1
+matplotlib>=3.7.1
+seaborn>=0.12.2
+
+# Type Hinting and Validation
+typing>=3.7.4.3
+pydantic>=1.10.7
+
+# System and Platform Utilities
+platform>=1.0.8
+psutil>=5.9.5
 
 # Logging and Debugging
 logging>=0.5.1.2
 
-# Type Hinting
-typing>=3.7.4.3
-
-# System and Platform
-platform>=1.0.8
-psutil>=5.9.4
-
 # Security
-cryptography>=40.0.2
-
-# Optional: For additional data manipulation
-scipy>=1.10.1
-scikit-learn>=1.2.2
-
-# Optional: For potential future enhancements
-requests>=2.28.2
-python-dotenv>=1.0.0
+cryptography>=41.0.1
 
 # Development and Testing
-pytest>=7.2.2
+pytest>=7.3.1
 pytest-cov>=4.0.0
-mypy>=1.2.0
+mypy>=1.3.0
 flake8>=6.0.0
+black>=23.3.0
 
-# Cross-platform compatibility
-importlib-metadata>=6.1.0
+# Performance and Optimization
+numba>=0.56.4
+dask>=2023.5.0
+
+# Cross-platform Compatibility
+importlib-metadata>=6.6.0
+
+# Optional: For potential future enhancements
+requests>=2.30.0
+python-dotenv>=1.0.0
+
+# Build and Packaging
+pyinstaller>=5.10.1
+py2exe>=0.13.0.0  # Windows-specific
+py2app>=0.28.6    # macOS-specific
