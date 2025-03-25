@@ -5,7 +5,7 @@ wheel>=0.42.0
 # Data Processing and Analysis
 pandas>=2.2.0
 numpy>=1.26.0
-openpyxl>=3.2.0
+openpyxl==3.2.0b1
 xlrd>=2.0.1
 XlsxWriter>=3.2.0
 
@@ -19,7 +19,7 @@ typing-extensions>=4.10.0
 pyxlsb>=1.0.9
 xlwings>=0.31.0
 
-# System Utilities (replace platform)
+# System Utilities
 importlib-metadata>=7.0.0
 psutil>=5.9.8
 
